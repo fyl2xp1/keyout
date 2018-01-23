@@ -16,4 +16,4 @@ Hint: you can **reset the bindings** to their original values by double-clicking
 
 # Internals
 
-The bindings are stored in the registry at `HKEY_CURRENT_USER\\Software\\fyl2xp1\\keyout\\bindings\\`
+The bindings are stored in the registry at `HKEY_CURRENT_USER\Software\fyl2xp1\keyout\bindings\`
