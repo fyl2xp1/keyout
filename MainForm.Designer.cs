@@ -797,7 +797,6 @@ namespace keyout
 			this.CameraTableLayoutPanel.ResumeLayout(false);
 			this.CameraTableLayoutPanel.PerformLayout();
 			this.ResumeLayout(false);
-
 		}
 	}
 }

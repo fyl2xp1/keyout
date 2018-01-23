@@ -6,9 +6,6 @@ namespace keyout
 {
 	internal sealed class Program
 	{
-		// Temporarily used for my hardcoded key assignments
-		private const uint QWERTY_SCANCODE_NUMPAD0 = 82;
-
 		private static readonly KeyConfiguration keyConfiguration = new KeyConfiguration(KeyConfiguration.REDOUT);
 		private static MainForm mainForm;
 		private static IntPtr _hookID = IntPtr.Zero;
@@ -16,16 +13,8 @@ namespace keyout
 		[STAThread]
 		private static void Main()
 		{
-			// my test-configuration
-			keyConfiguration.Assign(Actions.Turbo, KeyConfiguration.QWERTY_SCANCODE_SPACE);
-			keyConfiguration.Assign(Actions.Acceleration, KeyConfiguration.QWERTY_SCANCODE_S);
-			keyConfiguration.Assign(Actions.RollLeft, KeyConfiguration.QWERTY_SCANCODE_A);
-			keyConfiguration.Assign(Actions.RollRight, KeyConfiguration.QWERTY_SCANCODE_D);
-			keyConfiguration.Assign(Actions.PowerUp, QWERTY_SCANCODE_NUMPAD0);
-			keyConfiguration.Assign(Actions.TurnLeft, KeyConfiguration.QWERTY_SCANCODE_LEFT);
-			keyConfiguration.Assign(Actions.TurnRight, KeyConfiguration.QWERTY_SCANCODE_RIGHT);
+			keyConfiguration.LoadFromRegistry();
 			
-			Debug.WriteLine("Main");
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			mainForm = new MainForm(keyConfiguration);
@@ -35,6 +24,9 @@ namespace keyout
 			} finally {
 				Extern.UnhookWindowsHookEx(_hookID);
 			}
+			
+			Debug.WriteLine("Saving key bindings to registry");
+			keyConfiguration.SaveToRegistry();
 		}
 		
 		private static IntPtr SetHook(Extern.LowLevelKeyboardProc proc)

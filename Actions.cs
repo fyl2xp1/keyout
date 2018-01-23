@@ -23,6 +23,5 @@ namespace keyout
 		PitchUp, PitchDown,
 		RollLeft, RollRight,
 		TurnLeft, TurnRight,
-		Max
-	}	
+	}
 }

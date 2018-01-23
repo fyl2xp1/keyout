@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace keyout
 {
@@ -60,7 +62,7 @@ namespace keyout
 		}
 		
 		
-		private readonly ActionKey[] actionKeys = new ActionKey[(int)Actions.Max];
+		private readonly ActionKey[] actionKeys = new ActionKey[Enum.GetValues(typeof(Actions)).Length];
 		private readonly Actions[] scanCodeActions = new Actions[256];
 		private readonly Actions[] extendedScanCodeActions = new Actions[256];
 		
@@ -97,10 +99,10 @@ namespace keyout
 			var oldKeyForAction = actionKeys[(int)action];
 			// remember the previously assigned action for the given key
 			var oldActionForKey = actions[actionKey.scanCode];
-			// there shall never exist two keys being assigned to the same action  
+			// there shall never exist two keys being assigned to the same action
 			var oldActions = oldKeyForAction.isExtended ? extendedScanCodeActions : scanCodeActions;
 			oldActions[oldKeyForAction.scanCode] = Actions.None;
-			// there shall never exist two actions being assigned to the same key 
+			// there shall never exist two actions being assigned to the same key
 			actionKeys[(int)oldActionForKey] = ActionKey.NONE;
 			// perform two-way assignment
 			actions[actionKey.scanCode] = action;
@@ -119,6 +121,47 @@ namespace keyout
 			var actions = isExtended ? extendedScanCodeActions : scanCodeActions;
 			var action = actions[scanCode];
 			return action != Actions.None && REDOUT.actionKeys[(int)action].SendKey(isKeyUp);
+		}
+		
+		public void LoadFromRegistry()
+		{
+//			const uint QWERTY_SCANCODE_NUMPAD0 = 82;
+			
+			var bindingsKey = Registry.CurrentUser.CreateSubKey(@"Software\fyl2xp1\keyout\bindings");
+			foreach (var actionName in bindingsKey.GetValueNames()) {
+				var extendedScancode = (uint) (bindingsKey.GetValue(actionName, 0) as Int32? ?? 234);
+
+				try {
+					var actionObject = Enum.Parse(typeof(Actions), actionName);
+//					if (actionObject == null) continue;
+					var action = actionObject as Actions? ?? Actions.None;
+					if (action == Actions.None) continue;
+					Debug.WriteLine(actionName + " " + action + " <-> " + extendedScancode);
+					Assign(action, extendedScancode);
+				} catch (ArgumentException) {
+					// ignore
+				} catch (OverflowException) {
+					// ignore
+				}
+			}
+			
+//			Assign(Actions.Turbo, KeyConfiguration.QWERTY_SCANCODE_SPACE);
+//			Assign(Actions.Acceleration, KeyConfiguration.QWERTY_SCANCODE_S);
+//			Assign(Actions.RollLeft, KeyConfiguration.QWERTY_SCANCODE_A);
+//			Assign(Actions.RollRight, KeyConfiguration.QWERTY_SCANCODE_D);
+//			Assign(Actions.PowerUp, QWERTY_SCANCODE_NUMPAD0);
+//			Assign(Actions.TurnLeft, KeyConfiguration.QWERTY_SCANCODE_LEFT);
+//			Assign(Actions.TurnRight, KeyConfiguration.QWERTY_SCANCODE_RIGHT);
+		}
+		
+		public void SaveToRegistry()
+		{
+			var bindingsKey = Registry.CurrentUser.CreateSubKey(@"Software\fyl2xp1\keyout\bindings", true);
+			foreach (var action in (Actions[]) Enum.GetValues(typeof(Actions))) {
+				var actionKey = this.GetActionKey(action);
+				uint extendedScancode = (actionKey.isExtended ? 0xe000u : 0) | actionKey.scanCode;
+				bindingsKey.SetValue(action.ToString(), extendedScancode, RegistryValueKind.DWord);
+			}
 		}
 		
 	}
