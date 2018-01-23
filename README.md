@@ -5,8 +5,8 @@ Should work with `QWERTY`, `QWERTZ` and `AZERTY`.
 
 # Usage
 
- 1. Start the application (a precompiled version resides in [bin/Debug/keyout.exe])
-![\[k\]eyout Screenshot](docs/keyout.png)
+ 1. Start the application (a precompiled version resides in [bin/Debug/keyout.exe](bin/Debug/keyout.exe))
+![\[k\]eyout Screenshot](doc/keyout.png)
  2. Click the action you want to rebind (the field will be highlighted in black)
  3. Press the key you want to assign to the selected action
  4. Use the **scroll-lock key to enable/disable** the bindings (the associated LED on your keyboard can be used as an indicator whether the bindings are currently enabled or disabled)
